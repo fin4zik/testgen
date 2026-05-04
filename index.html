@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>Генератор тестів</title>
+    <style>
+        :root {
+            --color-canvas-body: #f6f8fa;
+            --color-canvas-overlay: #ffffff;
+            --color-border-default: #d0d7de;
+            --color-border-muted: hsla(210,18%,87%,1);
+            --color-fg-default: #24292f;
+            --color-fg-muted: #57606a;
+            --color-accent-fg: #0969da;
+            --color-success-emphasis: #2da44e;
+            --color-success-hover: #2c974b;
+            --color-danger-fg: #cf222e;
+            --color-diff-add-bg: #e6ffec;
+            --color-diff-del-bg: #ffebe9;
+            --color-btn-bg: #f6f8fa;
+            --color-btn-border: rgba(27, 31, 36, 0.15);
+            --color-btn-hover-bg: #f3f4f6;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        html { scroll-behavior: smooth; }
+        
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: var(--color-canvas-body); 
+            color: var(--color-fg-default); 
+            margin: 0; 
+            padding: 40px 20px; 
+            line-height: 1.5;
+            font-size: 14px;
+            min-height: 100vh;
+        }
+
+        .container { 
+            max-width: 768px;
+            margin: 0 auto;
+            background-color: var(--color-canvas-overlay);
+            border: 1px solid var(--color-border-default);
+            border-radius: 6px;
+            padding: 32px;
+            box-shadow: 0 1px 3px rgba(27,31,36,0.04);
+        }
+
+        h2 { margin: 0 0 24px 0; font-size: 24px; font-weight: 600; border-bottom: 1px solid var(--color-border-muted); padding-bottom: 12px; }
+        h3 { margin: 0 0 12px 0; font-size: 16px; font-weight: 600; }
+        .text-small { color: var(--color-fg-muted); font-size: 13px; margin: 0; }
+
+        .mb-8 { margin-bottom: 8px !important; }
+        .mb-16 { margin-bottom: 16px !important; }
+        .mb-24 { margin-bottom: 24px !important; }
+        .mb-32 { margin-bottom: 32px !important; }
+        
+        .flex-row { display: flex; align-items: center; gap: 12px; }
+
+        .textarea-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        textarea { 
+            width: 100%; 
+            height: 250px; 
+            padding: 12px 36px 12px 12px; 
+            background-color: var(--color-canvas-overlay);
+            border: 1px solid var(--color-border-default); 
+            border-radius: 6px; 
+            resize: none; 
+            font-family: inherit; 
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--color-fg-default);
+            caret-color: var(--color-fg-default); 
+            box-shadow: inset 0 1px 2px rgba(27,31,36,0.075);
+            transition: border-color 0.2s, box-shadow 0.2s, color 0.15s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--color-accent-fg);
+            box-shadow: inset 0 0 0 1px var(--color-accent-fg);
+        }
+
+        textarea.text-clearing { color: transparent; }
+
+        .clear-text-btn {
+            position: absolute;
+            top: 8px; right: 8px;
+            background: transparent;
+            border: none;
+            color: var(--color-fg-muted);
+            cursor: pointer;
+            padding: 6px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.6;
+            transition: opacity 0.15s ease, color 0.15s ease;
+            z-index: 2;
+        }
+        .clear-text-btn.active { display: flex; animation: popIn 0.15s ease-out forwards; }
+        .clear-text-btn.hiding { display: flex; animation: popOut 0.1s ease-in forwards; }
+        .clear-text-btn:hover { opacity: 1; color: var(--color-danger-fg); }
+
+        .Box {
+            background-color: var(--color-canvas-overlay);
+            border: 1px solid var(--color-border-default);
+            border-radius: 6px;
+            margin-bottom: 24px;
+            overflow: hidden; 
+        }
+
+        .Box-header {
+            background-color: var(--color-canvas-body);
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--color-border-default);
+            font-weight: 600;
+        }
+
+        .Box-row {
+            padding: 16px;
+            border-top: 1px solid var(--color-border-muted);
+            display: flex;
+            align-items: flex-start;
+            transition: background-color 0.1s ease;
+            cursor: pointer;
+        }
+        
+        .Box-row:first-of-type { border-top: none; }
+        #question-container .Box-row:hover { background-color: var(--color-canvas-body); }
+
+        .btn { 
+            background-color: var(--color-btn-bg); 
+            color: var(--color-fg-default); 
+            padding: 5px 16px; 
+            border: 1px solid var(--color-btn-border); 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 14px; 
+            font-weight: 500;
+            line-height: 20px;
+            height: 32px; 
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.15s ease;
+        }
+        .btn:hover { background-color: var(--color-btn-hover-bg); }
+        .btn-primary { background-color: var(--color-success-emphasis); color: #ffffff; border-color: rgba(27, 31, 36, 0.15); }
+        .btn-primary:hover { background-color: var(--color-success-hover); }
+        .btn-danger { color: var(--color-danger-fg); }
+        .btn-danger:hover { background-color: var(--color-danger-fg); color: #ffffff; border-color: var(--color-danger-fg); }
+
+        .btn-back-top { gap: 8px; color: var(--color-accent-fg); background-color: var(--color-canvas-overlay); }
+
+        .inline-error {
+            color: var(--color-danger-fg);
+            font-size: 13px;
+            font-weight: 500;
+            display: none; 
+            align-items: center;
+        }
+        .inline-error.active { 
+            display: flex; 
+            animation: fadeInSubtle 0.2s ease-out forwards; 
+        }
+
+        .form-checkbox { 
+            appearance: none; -webkit-appearance: none;
+            margin: 3px 12px 0 0; 
+            cursor: pointer; 
+            width: 16px; height: 16px; flex-shrink: 0;
+            border: 1px solid var(--color-fg-muted);
+            border-radius: 4px;
+            background-color: transparent;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s ease;
+        }
+
+        .form-checkbox:checked {
+            background-color: var(--color-accent-fg);
+            border-color: var(--color-accent-fg);
+            animation: checkboxBounce 0.2s ease-in-out;
+        }
+
+        .form-checkbox::after {
+            content: '';
+            width: 4px;
+            height: 8px;
+            border: solid #ffffff;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg) scale(0);
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin-bottom: 2px;
+        }
+
+        .form-checkbox:checked::after {
+            transform: rotate(45deg) scale(1);
+        }
+        
+        input[type="radio"] { 
+            appearance: none; -webkit-appearance: none;
+            width: 16px; height: 16px;
+            border: 1px solid var(--color-fg-muted);
+            border-radius: 50%;
+            margin: 3px 12px 0 0;
+            outline: none;
+            background-color: transparent;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        input[type="radio"]:checked { border: 5px solid var(--color-accent-fg); }
+
+        .diff-add { background-color: var(--color-diff-add-bg) !important; box-shadow: inset 4px 0 0 var(--color-success-emphasis) !important; }
+        .diff-del { background-color: var(--color-diff-del-bg) !important; box-shadow: inset 4px 0 0 var(--color-danger-fg) !important; }
+
+        #test-screen, #result-screen { display: none; }
+        .question-text { font-size: 16px; font-weight: 600; margin-bottom: 12px; line-height: 1.5; }
+
+        .label {
+            display: inline-flex; align-items: center;
+            padding: 0 8px;
+            font-size: 12px; font-weight: 500;
+            height: 22px;
+            border-radius: 2em;
+            border: 1px solid var(--color-border-default);
+            margin-left: 8px;
+            color: var(--color-fg-muted);
+        }
+
+        .review-block { margin-bottom: 32px; }
+
+        @keyframes fadeInFast { from { opacity: 0; } to { opacity: 1; } }
+        .fade-in { animation: fadeInFast 0.1s ease-in-out; }
+        @keyframes fadeInSubtle { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-screen { animation: fadeInSubtle 0.2s ease-out forwards; }
+        @keyframes popIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+        @keyframes popOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.8); } }
+        @keyframes checkboxBounce {
+            0% { transform: scale(1); }
+            40% { transform: scale(0.85); }
+            100% { transform: scale(1); }
+        }
+
+        @media (max-width: 600px) {
+            .btn {
+                height: auto !important;
+                min-height: 40px;
+            }
+            .btn svg { flex-shrink: 0; }
+
+            #setup-screen .flex-row {
+                flex-wrap: wrap; 
+            }
+            #setup-screen .btn {
+                width: 100%;
+            }
+            .inline-error {
+                margin-top: 8px;
+                width: 100%;
+                justify-content: center;
+            }
+
+            #result-screen .btn {
+                width: 100%;
+            }
+
+            #test-screen .flex-row {
+                flex-wrap: nowrap;
+                gap: 8px;
+                align-items: stretch !important; 
+            }
+            #test-screen .btn {
+                width: 100%;
+                max-width: calc(50% - 4px); 
+                padding: 6px 4px;
+                font-size: 13px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container fade-screen" id="setup-screen">
+    <h2>Генератор тестів</h2>
+
+    <div class="mb-24">
+        <h3 class="mb-8">Вхідні дані</h3>
+        <div class="textarea-wrapper">
+            <textarea id="raw-text" placeholder="1. Текст питання...&#10;A) Правильна відповідь&#10;B) Неправильна відповідь"></textarea>
+            <button class="clear-text-btn" id="clear-btn" title="Очистити текст" onmousedown="clearText(event)">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M3.72 3.72a.75.75 0 011.06 0L8 6.94l3.22-3.22a.75.75 0 111.06 1.06L9.06 8l3.22 3.22a.75.75 0 11-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 01-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 010-1.06z"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+    
+    <div class="Box">
+        <div class="Box-header">Налаштування</div>
+        <label class="Box-row">
+            <input type="checkbox" id="immediate-mode" class="form-checkbox" checked> 
+            <div>
+                <strong>Режим навчання</strong>
+                <p class="text-small" style="margin-top: 4px;">Показувати правильну відповідь одразу після вибору.</p>
+            </div>
+        </label>
+        <label class="Box-row">
+            <input type="checkbox" id="clean-metadata" class="form-checkbox" checked> 
+            <div>
+                <strong>Розумне очищення</strong>
+                <p class="text-small" style="margin-top: 4px;">Видаляти дані, що не стосуються питання.</p>
+            </div>
+        </label>
+    </div>
+    
+    <div class="flex-row">
+        <button class="btn btn-primary" onclick="startTest()">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 6px;">
+                <path d="M11.533 7.672l-5.023-3.024A.5.5 0 005.75 5.07v6.042a.5.5 0 00.76.422l5.023-3.024a.5.5 0 000-.838z"></path>
+            </svg>
+            Створити тест
+        </button>
+        
+        <span id="inline-error" class="inline-error">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 6px;">
+                <path d="M8.22 1.754a.25.25 0 00-.44 0L1.698 13.132a.25.25 0 00.22.368h12.164a.25.25 0 00.22-.368L8.22 1.754zm-1.763-.707c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0114.082 15H1.918a1.75 1.75 0 01-1.543-2.575L6.457 1.047zM9 11a1 1 0 11-2 0 1 1 0 012 0zm-.25-5.25a.75.75 0 00-1.5 0v2.5a.75.75 0 001.5 0v-2.5z"></path>
+            </svg>
+            Не вдалося розпізнати питання. Перевірте формат.
+        </span>
+    </div>
+</div>
+
+<div class="container" id="test-screen">
+    <div class="mb-24" style="border-bottom: 1px solid var(--color-border-muted); padding-bottom: 16px;">
+        <h3 style="margin: 0; display: flex; align-items: center; line-height: 1;">
+            Проходження тесту <span class="label" id="progress-text">1 / 10</span>
+        </h3>
+    </div>
+    
+    <div id="question-container"></div>
+    <div class="flex-row" style="margin-top: 24px;">
+        <button onclick="nextQuestion()" id="next-btn" class="btn btn-primary fade-in" style="display:none;">
+            Наступне питання
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="margin-left: 6px;">
+                <path d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z"></path>
+            </svg>
+        </button>
+        <button onclick="finishTest()" id="finish-btn" class="btn btn-primary fade-in" style="display:none;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 6px;">
+                <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path>
+            </svg>
+            Завершити тест
+        </button>
+        <button onclick="finishTest()" id="early-finish-btn" class="btn btn-danger fade-in" style="margin-left: auto;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 6px;">
+                <rect x="3.5" y="3.5" width="9" height="9" rx="1.5"></rect>
+            </svg>
+            Завершити достроково
+        </button>
+    </div>
+</div>
+
+<div class="container" id="result-screen">
+    <h2>Результати</h2>
+    <div style="font-size: 32px; font-weight: 600;" class="mb-8">
+        <span id="final-score-percent"></span>
+    </div>
+    
+    <p class="text-small mb-24" id="final-score-text" style="font-size: 14px;"></p>
+    
+    <button onclick="location.reload()" class="btn btn-primary mb-24">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 6px;">
+            <path d="M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z"></path>
+        </svg>
+        Створити новий тест
+    </button>
+    
+    <hr style="border: none; border-top: 1px solid var(--color-border-muted); margin-bottom: 32px;">
+    
+    <div id="review-container"></div>
+    
+    <div style="margin-top: 32px;">
+        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'});" class="btn btn-back-top">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 6px;">
+                <path d="M3.47 7.78a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0l4.25 4.25a.751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018L8.75 4.56v9.69a.75.75 0 0 1-1.5 0V4.56L4.03 7.78a.75.75 0 0 1-1.06 0Z"></path>
+            </svg>
+            Повернутися нагору
+        </button>
+    </div>
+</div>
+
+<script>
+    let questions = [];
+    let currentQuestionIndex = 0;
+    let isImmediateMode = false;
+
+    function getLetter(index) {
+        return index < 26 ? String.fromCharCode(65 + index) : `Вар. ${index + 1}`; 
+    }
+
+    document.addEventListener('keydown', function(event) {
+        const setupScreen = document.getElementById('setup-screen');
+        const resultScreen = document.getElementById('result-screen');
+        
+        if (event.key === 'Enter' && event.shiftKey) {
+            if (setupScreen.style.display !== 'none') {
+                event.preventDefault(); 
+                startTest();
+            } 
+            else if (resultScreen.style.display === 'block') {
+                event.preventDefault();
+                location.reload();
+            }
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const rawText = document.getElementById('raw-text');
+        const clearBtn = document.getElementById('clear-btn');
+        const savedText = localStorage.getItem('savedTestText');
+
+        const toggleClearBtn = () => {
+            if (rawText.value.length > 0) {
+                if (!clearBtn.classList.contains('active')) {
+                    clearBtn.style.display = 'flex';
+                    clearBtn.classList.remove('hiding');
+                    clearBtn.classList.add('active');
+                }
+            } else {
+                if (clearBtn.classList.contains('active')) {
+                    clearBtn.classList.remove('active');
+                    clearBtn.classList.add('hiding');
+                    setTimeout(() => {
+                        if (!clearBtn.classList.contains('active')) clearBtn.style.display = 'none';
+                    }, 100);
+                }
+            }
+        };
+
+        if (savedText) {
+            rawText.value = savedText;
+            toggleClearBtn();
+        }
+
+        rawText.addEventListener('input', function() {
+            localStorage.setItem('savedTestText', this.value);
+            toggleClearBtn();
+        });
+    });
+
+    function clearText(event) {
+        if (event) event.preventDefault(); 
+        
+        const rawText = document.getElementById('raw-text');
+        const clearBtn = document.getElementById('clear-btn');
+        
+        rawText.classList.add('text-clearing');
+        clearBtn.classList.remove('active');
+        clearBtn.classList.add('hiding');
+
+        setTimeout(() => {
+            rawText.value = '';
+            localStorage.removeItem('savedTestText');
+            clearBtn.style.display = 'none';
+            rawText.classList.remove('text-clearing');
+        }, 150);
+    }
+
+    function formatQuestionHTML(text) {
+        return escapeHTML((text || '').trim()).replace(/\n/g, '<br>');
+    }
+
+    function escapeHTML(str) {
+        if (!str) return '';
+        return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+    }
+
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function cleanQuestionText(text) {
+        const isCleanEnabled = document.getElementById('clean-metadata').checked;
+        text = text.replace(/<!--[\s\S]*?-->/g, '');
+        let lines = text.split('\n');
+        let processedLines = [];
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i].trim();
+            if (!line) {
+                if (processedLines.length > 0 && processedLines[processedLines.length-1] !== '') processedLines.push('');
+                continue;
+            }
+            if (isCleanEnabled) {
+                if (/^(крок|база)\s+\d{4}/i.test(line) || /^(ДИСЦИПЛІНА|РОЗДІЛ|ТЕМА)(\s|:|$)/i.test(line)) continue;
+                if (/^Текст\s+задания\s*/i.test(line)) line = line.replace(/^Текст\s+задания\s*/i, '');
+                if (processedLines.length > 0 && processedLines[processedLines.length-1] !== '') {
+                    processedLines[processedLines.length-1] += ' ' + line;
+                    continue;
+                }
+            }
+            processedLines.push(line);
+        }
+        return processedLines.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+    }
+
+    function parseText(text) {
+        const blocks = text.split(/(?:^|\n)(?:\d+[\.\)]|№\s*\d+)\s+/).filter(b => b.trim().length > 0);
+        const parsed = [];
+        blocks.forEach(block => {
+            const match = block.match(/\n\s*(?:[A-ZА-ЯІЇЄҐ][\.\)]|Правильный\s+ответ\s)/i);
+            if (match) {
+                let qText = cleanQuestionText(block.substring(0, match.index).trim());
+                const optionsPart = "\n" + block.substring(match.index).trim();
+                const optsRaw = optionsPart.split(/\n\s*(?:Правильный\s+ответ\s*|[A-ZА-ЯІЇЄҐ][\.\)]|[A-ZА-ЯІЇЄҐ]\s+(?=[^\s]))/i).filter(o => o.trim().length > 0);
+                let options = shuffle(optsRaw.map((opt, index) => ({ text: opt.replace(/;$/, '').trim(), isCorrect: index === 0 })));
+                if(options.length > 0) parsed.push({ question: qText, options: options, userAnswerIndex: null });
+            }
+        });
+        return parsed;
+    }
+
+    function startTest() {
+        const text = document.getElementById('raw-text').value;
+        const inlineError = document.getElementById('inline-error');
+        isImmediateMode = document.getElementById('immediate-mode').checked;
+        
+        questions = parseText(text);
+        
+        if (questions.length === 0) {
+            inlineError.classList.add('active');
+            return;
+        }
+        
+        inlineError.classList.remove('active');
+        
+        questions = shuffle(questions);
+        document.getElementById('setup-screen').style.display = 'none';
+        const testScreen = document.getElementById('test-screen');
+        testScreen.style.display = 'block';
+        testScreen.classList.add('fade-screen');
+        currentQuestionIndex = 0;
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        const container = document.getElementById('question-container');
+        const q = questions[currentQuestionIndex];
+        container.classList.remove('fade-in');
+        void container.offsetWidth; 
+        container.classList.add('fade-in');
+        
+        document.getElementById('progress-text').innerText = `${currentQuestionIndex + 1} / ${questions.length}`;
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('finish-btn').style.display = 'none';
+        document.getElementById('early-finish-btn').style.display = 'inline-flex';
+        
+        let html = `<div class="question-text">${formatQuestionHTML(q.question)}</div><div class="Box" style="margin-bottom: 0;">`;
+        q.options.forEach((opt, index) => {
+            html += `<label class="Box-row" id="opt-${index}">
+                        <input type="radio" name="answer" value="${index}" onchange="selectAnswer(${index})">
+                        <span><strong>${getLetter(index)})</strong> ${escapeHTML(opt.text)}</span>
+                    </label>`;
+        });
+        container.innerHTML = html + `</div>`;
+    }
+
+    function selectAnswer(selectedIndex) {
+        const q = questions[currentQuestionIndex];
+        const container = document.getElementById('question-container');
+        const optionsNodes = container.querySelectorAll('.Box-row');
+        
+        q.userAnswerIndex = selectedIndex;
+        
+        if (isImmediateMode) {
+            container.querySelectorAll('input[type="radio"]').forEach(r => r.disabled = true); 
+            if (q.options[selectedIndex].isCorrect) {
+                optionsNodes[selectedIndex].classList.add('diff-add');
+            } else {
+                optionsNodes[selectedIndex].classList.add('diff-del');
+                q.options.forEach((opt, idx) => { if (opt.isCorrect) optionsNodes[idx].classList.add('diff-add'); });
+            }
+        }
+        if (currentQuestionIndex < questions.length - 1) document.getElementById('next-btn').style.display = 'inline-flex';
+        else document.getElementById('finish-btn').style.display = 'inline-flex';
+    }
+
+    function nextQuestion() { currentQuestionIndex++; renderQuestion(); }
+
+    function finishTest() {
+        document.getElementById('test-screen').style.display = 'none';
+        const resultScreen = document.getElementById('result-screen');
+        resultScreen.style.display = 'block';
+        resultScreen.classList.add('fade-screen');
+        window.scrollTo({top: 0, behavior: 'smooth'});
+        
+        let score = 0, reviewHtml = '';
+        questions.forEach((q, qIndex) => {
+            if (q.userAnswerIndex !== null && q.options[q.userAnswerIndex].isCorrect) score++;
+            reviewHtml += `<div class="review-block"><div class="question-text">${qIndex + 1}. ${formatQuestionHTML(q.question)}</div><div class="Box">`;
+            q.options.forEach((opt, oIndex) => {
+                let optClass = opt.isCorrect ? 'diff-add' : (q.userAnswerIndex === oIndex ? 'diff-del' : '');
+                let userMark = q.userAnswerIndex === oIndex ? ' <span class="label">Обрано</span>' : (q.userAnswerIndex === null && opt.isCorrect ? ' <span class="label">Пропущено</span>' : '');
+                reviewHtml += `<div class="Box-row ${optClass}" style="cursor: default;"><span><strong>${getLetter(oIndex)})</strong> ${escapeHTML(opt.text)} ${userMark}</span></div>`;
+            });
+            reviewHtml += `</div></div>`;
+        });
+        
+        const percentage = Math.round((score / questions.length) * 100);
+        document.getElementById('final-score-percent').innerHTML = `<span style="color: ${percentage >= 60.5 ? 'var(--color-success-emphasis)' : 'var(--color-danger-fg)'}">${percentage}%</span>`;
+        document.getElementById('final-score-text').innerHTML = `${score} з ${questions.length} правильних відповідей`;
+        document.getElementById('review-container').innerHTML = reviewHtml;
+    }
+</script>
+</body>
+</html>
