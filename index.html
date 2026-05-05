@@ -14189,7 +14189,6 @@ E Трофобластичну`
     }
 
 	function cleanQuestionText(text) {
-		// Видаляємо HTML коментарі
 		text = text.replace(/<!--[\s\S]*?-->/g, '');
 		
 		let lines = text.split('\n');
@@ -14202,7 +14201,6 @@ E Трофобластичну`
 				continue;
 			}
 
-			// Логіка "розумного очищення" метаданих
 			if (/^(крок|база)\s+\d{4}/i.test(line) || 
 				/^(ДИСЦИПЛІНА|РОЗДІЛ|ТЕМА|БІОЛОГІЯ|АНАТОМІЯ|ГІСТОЛОГІЯ)(\s|:|$)/i.test(line) ||
 				/^№\s*\d+/i.test(line)) {
@@ -14211,7 +14209,6 @@ E Трофобластичну`
 			
 			if (/^Текст\s+задания\s*/i.test(line)) line = line.replace(/^Текст\s+задания\s*/i, '');
 			
-			// Склеюємо розірвані рядки питання в один параграф
 			if (processedLines.length > 0 && processedLines[processedLines.length-1] !== '') {
 				processedLines[processedLines.length-1] += ' ' + line;
 				continue;
@@ -14225,22 +14222,18 @@ E Трофобластичну`
 	function parseText(text) {
 		if (!text) return [];
 		
-		// Розбиваємо текст на блоки за номерами питань (1. або №1 або 1))
 		const blocks = text.split(/(?:^|\n)(?:\d+[\.\)]|№\s*\d+)\s+/).filter(b => b.trim().length > 0);
 		const parsed = [];
 
 		blocks.forEach(block => {
-			// Шукаємо початок варіантів (A), B) або "Правильный ответ")
 			const match = block.match(/\n\s*(?:[A-ZА-ЯІЇЄҐ][\.\)]|Правильный\s+ответ\s)/i);
 			
 			if (match) {
 				let qText = cleanQuestionText(block.substring(0, match.index).trim());
 				const optionsPart = "\n" + block.substring(match.index).trim();
 				
-				// Розбиваємо на окремі варіанти
 				const optsRaw = optionsPart.split(/\n\s*(?:Правильный\s+ответ\s*|[A-ZА-ЯІЇЄҐ][\.\)]|[A-ZА-ЯІЇЄҐ]\s+(?=[^\s]))/i).filter(o => o.trim().length > 0);
 				
-				// Створюємо масив об'єктів. ПЕРШИЙ варіант у списку вважається правильним (index === 0)
 				let options = optsRaw.map((opt, index) => ({
 					text: opt.replace(/;$/, '').trim(),
 					isCorrect: index === 0
@@ -14249,7 +14242,7 @@ E Трофобластичну`
 				if (options.length > 0 && qText.length > 0) {
 					parsed.push({ 
 						question: qText, 
-						options: options, // Вони будуть перемішані пізніше у startTest
+						options: options,
 						userAnswerIndex: null 
 					});
 				}
@@ -14363,23 +14356,29 @@ E Трофобластичну`
         }
     }
 
-    function updateGrid(isInitial = false) {
-        questions.forEach((q, idx) => {
-            const dot = document.getElementById(`dot-${idx}`);
-            dot.className = 'q-dot';
-            if (idx === currentQuestionIndex) dot.classList.add('active');
-            else if (q.userAnswerIndex !== null) {
-                if (isImmediateMode) {
-                    dot.classList.add(q.options[q.userAnswerIndex].isCorrect ? 'correct' : 'wrong');
-                } else {
-                    dot.classList.add('answered');
-                }
-            }
-        });
-        
-        const activeDot = document.getElementById(`dot-${currentQuestionIndex}`);
-        if(activeDot) activeDot.scrollIntoView({ behavior: isInitial ? 'auto' : 'smooth', block: 'nearest' });
-    }
+	function updateGrid(isInitial = false) {
+			questions.forEach((q, idx) => {
+				const dot = document.getElementById(`dot-${idx}`);
+				dot.className = 'q-dot';
+				if (idx === currentQuestionIndex) dot.classList.add('active');
+				else if (q.userAnswerIndex !== null) {
+					if (isImmediateMode) {
+						dot.classList.add(q.options[q.userAnswerIndex].isCorrect ? 'correct' : 'wrong');
+					} else {
+						dot.classList.add('answered');
+					}
+				}
+			});
+			
+			const activeDot = document.getElementById(`dot-${currentQuestionIndex}`);
+			
+			if(activeDot && window.innerWidth > 768) { 
+				activeDot.scrollIntoView({ 
+					behavior: isInitial ? 'auto' : 'smooth', 
+					block: 'nearest' 
+				});
+			}
+		}
 
     function renderQuestionHTML(isInitial = false) {
         const wrapper = document.getElementById('question-wrapper');
