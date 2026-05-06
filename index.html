@@ -14483,8 +14483,9 @@ E Трофобластичну`
             reviewHtml += `</div></div>`;
         });
         
-        const percentage = Math.round((score / questions.length) * 100);
-        const colorClass = percentage >= 60.5 ? 'text-success' : 'text-danger';
+		const percentage = Math.round((score / questions.length) * 100);
+		const threshold = isControlMode ? 95 : 80;
+		const colorClass = percentage >= threshold ? 'text-success' : 'text-danger';
         
         document.getElementById('final-score-percent').innerHTML = `<span class="${colorClass}">${percentage}%</span>`;
         document.getElementById('final-score-text').innerHTML = `Правильних відповідей: <strong>${score} з ${questions.length}</strong>`;
