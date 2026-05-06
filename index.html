@@ -445,7 +445,7 @@
         </div>
         
         <div class="mb-32">
-            <button onclick="location.reload()" class="btn btn-primary">
+			<button onclick="localStorage.removeItem('testgen_progress'); location.reload();" class="btn btn-primary">
                 <svg class="icon mr-6"><use href="#icon-refresh"></use></svg> Нове тестування
             </button>
         </div>
@@ -14151,10 +14151,11 @@ E Трофобластичну`
         localStorage.setItem('customCount', document.getElementById('question-count').value);
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        loadSettings();
-        updateHint();
-    });
+	document.addEventListener('DOMContentLoaded', () => {
+		loadSettings();
+		updateHint();
+		loadGameState();
+	});	
 
 	function updateHint() {
 		const subj = document.getElementById('subject-select').value;
@@ -14291,6 +14292,7 @@ E Трофобластичну`
         initGrid();
         renderQuestionHTML(true); 
         startTimer();
+		saveGameState('test');
     }
 
     function startTimer() {
@@ -14354,6 +14356,7 @@ E Трофобластичну`
             currentQuestionIndex = idx; 
             renderQuestionHTML(); 
         }
+		saveGameState();
     }
 
 	function updateGrid(isInitial = false) {
@@ -14443,10 +14446,11 @@ E Трофобластичну`
             });
         }
         updateGrid();
+		saveGameState();
     }
 
-    function prevQuestion() { if (currentQuestionIndex > 0) { currentQuestionIndex--; renderQuestionHTML(); } }
-    function nextQuestion() { if (currentQuestionIndex < questions.length - 1) { currentQuestionIndex++; renderQuestionHTML(); } }
+    function prevQuestion() { if (currentQuestionIndex > 0) { currentQuestionIndex--; renderQuestionHTML(); } saveGameState(); }
+    function nextQuestion() { if (currentQuestionIndex < questions.length - 1) { currentQuestionIndex++; renderQuestionHTML(); } saveGameState(); }
 
     function finishTestPrompt() {
         const unanswered = questions.filter(q => q.userAnswerIndex === null).length;
@@ -14461,36 +14465,107 @@ E Трофобластичну`
     function closeModal() { document.getElementById('custom-modal').classList.remove('active'); }
     function confirmFinish() { closeModal(); finishTest(); }
 
-    function finishTest() {
-        clearInterval(timerInterval);
-        document.getElementById('test-screen').style.display = 'none';
-        
-        const resultScreen = document.getElementById('result-screen');
-        resultScreen.style.display = 'block';
-        resultScreen.classList.add('fade-screen');
-        window.scrollTo({top: 0, behavior: 'smooth'});
-        
-        let score = 0, reviewHtml = '';
-        questions.forEach((q, qIndex) => {
-            if (q.userAnswerIndex !== null && q.options[q.userAnswerIndex].isCorrect) score++;
-            
-            reviewHtml += `<div class="review-item"><div class="question-text">${qIndex + 1}. ${formatQuestionHTML(q.question)}</div><div class="Box mb-0">`;
-            q.options.forEach((opt, oIndex) => {
-                let optClass = opt.isCorrect ? 'diff-add' : (q.userAnswerIndex === oIndex ? 'diff-del' : '');
-                let userMark = q.userAnswerIndex === oIndex ? ' <span class="label ml-8">Обрано</span>' : (q.userAnswerIndex === null && opt.isCorrect ? ' <span class="label ml-8">Пропущено</span>' : '');
-                reviewHtml += `<div class="Box-row flex items-start cursor-default ${optClass}" style="pointer-events: none;"><span><strong class="mr-6">${getLetter(oIndex)})</strong>${escapeHTML(opt.text)}${userMark}</span></div>`;
-            });
-            reviewHtml += `</div></div>`;
-        });
-        
-		const percentage = Math.round((score / questions.length) * 100);
-		const threshold = isControlMode ? 95 : 80;
-		const colorClass = percentage >= threshold ? 'text-success' : 'text-danger';
-        
-        document.getElementById('final-score-percent').innerHTML = `<span class="${colorClass}">${percentage}%</span>`;
-        document.getElementById('final-score-text').innerHTML = `Правильних відповідей: <strong>${score} з ${questions.length}</strong>`;
-        document.getElementById('review-container').innerHTML = reviewHtml;
-    }
+	function finishTest(isReload = false) {
+			clearInterval(timerInterval);
+			document.getElementById('test-screen').style.display = 'none';
+
+			const resultScreen = document.getElementById('result-screen');
+			resultScreen.style.display = 'block';
+			
+			if (!isReload) resultScreen.classList.add('fade-screen');
+			
+			window.scrollTo({top: 0, behavior: 'smooth'});
+
+			let score = 0, reviewHtml = '';
+			questions.forEach((q, qIndex) => {
+				if (q.userAnswerIndex !== null && q.options[q.userAnswerIndex].isCorrect) score++;
+				
+				reviewHtml += `<div class="review-item"><div class="question-text">${qIndex + 1}. ${formatQuestionHTML(q.question)}</div><div class="Box mb-0">`;
+				q.options.forEach((opt, oIndex) => {
+					let optClass = opt.isCorrect ? 'diff-add' : (q.userAnswerIndex === oIndex ? 'diff-del' : '');
+					let userMark = q.userAnswerIndex === oIndex ? ' <span class="label ml-8">Обрано</span>' : (q.userAnswerIndex === null && opt.isCorrect ? ' <span class="label ml-8">Пропущено</span>' : '');
+					reviewHtml += `<div class="Box-row flex items-start cursor-default ${optClass}" style="pointer-events: none;"><span><strong class="mr-6">${getLetter(oIndex)})</strong>${escapeHTML(opt.text)}${userMark}</span></div>`;
+				});
+				reviewHtml += `</div></div>`;
+			});
+
+			const percentage = Math.round((score / questions.length) * 100);
+			const threshold = isControlMode ? 94 : 80;
+			const colorClass = percentage >= threshold ? 'text-success' : 'text-danger';
+			
+			document.getElementById('final-score-percent').innerHTML = `<span class="${colorClass}">${percentage}%</span>`;
+			document.getElementById('final-score-text').innerHTML = `Правильних відповідей: <strong>${score} з ${questions.length}</strong>`;
+			document.getElementById('review-container').innerHTML = reviewHtml;
+
+			if (!isReload) saveGameState('result');
+		}
+	
+	function saveGameState(screenName) {
+		const state = {
+			questions,
+			currentQuestionIndex,
+			isImmediateMode,
+			isControlMode,
+			startTime,
+			targetEndTime,
+			screen: screenName || (document.getElementById('test-screen').style.display === 'block' ? 'test' : 
+					 document.getElementById('result-screen').style.display === 'block' ? 'result' : 'setup')
+		};
+		localStorage.setItem('testgen_progress', JSON.stringify(state));
+	}
+
+	function loadGameState() {
+		const saved = localStorage.getItem('testgen_progress');
+		if (!saved) return;
+		const state = JSON.parse(saved);
+
+		questions = state.questions;
+		currentQuestionIndex = state.currentQuestionIndex;
+		isImmediateMode = state.isImmediateMode;
+		isControlMode = state.isControlMode;
+		startTime = state.startTime;
+		targetEndTime = state.targetEndTime;
+
+		if (state.screen === 'test') {
+			document.getElementById('setup-screen').style.display = 'none';
+			document.getElementById('test-screen').style.display = 'block';
+			initGrid();
+			renderQuestionHTML(true);
+			resumeTimer();
+		} else if (state.screen === 'result') {
+			document.getElementById('setup-screen').style.display = 'none';
+			finishTest(true);
+		}
+	}
+
+	function resumeTimer() {
+			clearInterval(timerInterval);
+
+			const now = Date.now();
+			if (isControlMode) {
+				displayedSeconds = Math.ceil((targetEndTime - now) / 1000);
+				if (displayedSeconds < 0) displayedSeconds = 0;
+			} else {
+				displayedSeconds = Math.floor((now - startTime) / 1000);
+			}
+			
+			updateTimerDisplay();
+
+			timerInterval = setInterval(() => {
+				const currentTime = Date.now();
+				if (isControlMode) {
+					displayedSeconds = Math.ceil((targetEndTime - currentTime) / 1000);
+					if (displayedSeconds <= 0) {
+						displayedSeconds = 0;
+						clearInterval(timerInterval);
+						finishTest();
+					}
+				} else {
+					displayedSeconds = Math.floor((currentTime - startTime) / 1000);
+				}
+				updateTimerDisplay();
+			}, 1000);
+		}
 </script>
 </body>
 </html>
