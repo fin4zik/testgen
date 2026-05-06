@@ -348,7 +348,7 @@
             <h3 class="Box-header">Вибір предмета</h3>
             <div class="Box-row flex-col cursor-default">
                 <div class="select-wrapper">
-                    <select id="subject-select" onchange="saveSettings(); updateHint();">
+                    <select id="subject-select" onchange="updateHint(true)">
                         <option value="anatomy">Анатомія</option>
 						<option value="histology">Гістологія</option>
                         <option value="biology">Медична біологія</option>
@@ -14130,19 +14130,25 @@ E Трофобластичну`
         setTimeout(() => html.classList.remove('theme-switching'), 300);
     }
 
-    function loadSettings() {
-        const savedSubj = localStorage.getItem('subject');
-        if (savedSubj) document.getElementById('subject-select').value = savedSubj;
+	function loadSettings() {
+			const savedSubj = localStorage.getItem('subject');
+			if (savedSubj) document.getElementById('subject-select').value = savedSubj;
 
-        const savedMode = localStorage.getItem('testMode');
-        if (savedMode) document.querySelector(`input[name="testMode"][value="${savedMode}"]`).checked = true;
+			const savedMode = localStorage.getItem('testMode');
+			if (savedMode) {
+				const radio = document.querySelector(`input[name="testMode"][value="${savedMode}"]`);
+				if (radio) radio.checked = true;
+			}
 
-        const savedImmediate = localStorage.getItem('immediateMode');
-        if (savedImmediate !== null) document.getElementById('immediate-mode').checked = savedImmediate === 'true';
-        
-        const currentTheme = document.documentElement.getAttribute('data-theme');
-        document.getElementById('theme-icon-use').setAttribute('href', currentTheme === 'light' ? '#icon-sun' : '#icon-moon');
-    }
+			const savedImmediate = localStorage.getItem('immediateMode');
+			if (savedImmediate !== null) document.getElementById('immediate-mode').checked = savedImmediate === 'true';
+			
+			const savedCount = localStorage.getItem('customCount');
+			if (savedCount) document.getElementById('question-count').value = savedCount;
+
+			const currentTheme = document.documentElement.getAttribute('data-theme');
+			document.getElementById('theme-icon-use').setAttribute('href', currentTheme === 'light' ? '#icon-sun' : '#icon-moon');
+		}
 
     function saveSettings() {
         localStorage.setItem('subject', document.getElementById('subject-select').value);
@@ -14153,25 +14159,33 @@ E Трофобластичну`
 
 	document.addEventListener('DOMContentLoaded', () => {
 		loadSettings();
-		updateHint();
+		updateHint(false);
 		loadGameState();
 	});	
 
-	function updateHint() {
-		const subj = document.getElementById('subject-select').value;
-		const allQuestions = parseText(databases[subj]);
-		const count = allQuestions.length;
-		
-		document.getElementById('db-hint').innerText = `Доступно питань у базі: ${count}`;
-		
-		const countInput = document.getElementById('question-count');
-		countInput.max = count;
-		
-		countInput.value = count > 0 ? count : 0;
-		
-		localStorage.setItem('customCount', countInput.value);
-		localStorage.setItem('subject', subj);
-	}
+	function updateHint(isManualChange = false) {
+			const subj = document.getElementById('subject-select').value;
+			const allQuestions = parseText(databases[subj]);
+			const count = allQuestions.length;
+			
+			document.getElementById('db-hint').innerText = `Доступно питань у базі: ${count}`;
+			
+			const countInput = document.getElementById('question-count');
+			countInput.max = count;
+			
+			if (isManualChange) {
+				countInput.value = count;
+			} else {
+				const savedCount = localStorage.getItem('customCount');
+				if (savedCount) {
+					countInput.value = Math.min(parseInt(savedCount), count);
+				} else {
+					countInput.value = count;
+				}
+			}
+			
+			saveSettings();
+		}
 
     function getLetter(index) { return String.fromCharCode(65 + index); }
 	function formatQuestionHTML(text) { return escapeHTML((text || '').trim()); }
