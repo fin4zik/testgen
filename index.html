@@ -87,6 +87,7 @@
         .justify-center { justify-content: center; }
         .gap-8 { gap: 8px; }
         .gap-12 { gap: 12px; }
+		.gap-16 { gap: 16px; }
         
         .mt-4 { margin-top: 4px; }
         .mt-8 { margin-top: 8px; }
@@ -143,9 +144,7 @@
         input[type="radio"], input[type="radio"]:checked { transition: border 0.15s ease, border-color 0.15s ease; }
         .form-checkbox, .form-checkbox::after { transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.2s ease; }
 
-        html.theme-switching, html.theme-switching * { transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, fill 0.3s ease, box-shadow 0.3s ease !important; }
-
-        .review-item { content-visibility: auto; contain-intrinsic-size: auto 200px; margin-bottom: 32px; }
+        .review-item { margin-bottom: 32px; }
 
         /* FOCUS OUTLINES (ACCESSIBILITY) */
         :focus-visible { outline: 2px solid var(--color-accent-fg); outline-offset: 2px; border-radius: 4px; }
@@ -194,7 +193,6 @@
 			display: flex; 
 			align-items: flex-start; 
 			cursor: pointer; 
-			/* Додаємо базовий стан тіні та анімацію */
 			box-shadow: inset 0 0 0 transparent;
 			transition: background-color 0.2s ease, box-shadow 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
 		}
@@ -276,7 +274,7 @@
         .q-dot.wrong { background: var(--color-danger-fg); color: #fff; border-color: var(--color-danger-fg); }
         .q-dot.correct { background: var(--color-success-emphasis); color: #fff; border-color: var(--color-success-emphasis); }
 
-        #test-screen, #result-screen { display: none; }
+        #test-screen, #result-screen, #view-screen { display: none; }
         .question-text { font-size: 16px; font-weight: 600; margin-bottom: 16px; line-height: 1.5; }
         
         .label { display: inline-flex; align-items: center; padding: 0 8px; font-size: 12px; font-weight: 500; height: 22px; border-radius: 2em; border: 1px solid var(--color-border-default); color: var(--color-fg-muted); }
@@ -305,8 +303,10 @@
         }
         .modal-overlay.active .modal-content { transform: translateY(0); }
 
+		.mobile-view-btn { display: none !important; }
+		
         /* RESPONSIVE */
-        @media (max-width: 768px) {
+		@media (max-width: 768px) {
             body { padding: 20px 10px; }
             .container { padding: 24px 16px; }
             .test-layout { flex-direction: column-reverse; gap: 24px; }
@@ -317,6 +317,22 @@
             .nav-btn-group { width: 100%; }
             .nav-btn-group .btn { flex: 1; height: 40px; }
             #early-finish-btn { width: 100%; height: 40px; margin-left: 0; }
+            
+            /* ФІКСИ ДЛЯ ТЕЛЕФОНІВ */
+            .range-mobile-wrap { flex-wrap: nowrap !important; }
+            .range-mobile-wrap input { width: 60px; padding: 5px 8px; }
+            
+            .main-btns-mobile { flex-direction: column; width: 100%; gap: 12px; align-items: stretch; }
+            .main-btns-mobile .btn { width: 100%; height: 40px; }
+            #start-error { text-align: center; margin: 0; }
+
+            .view-btn-mobile { width: 100%; height: 40px; justify-content: center; }
+            
+            .bottom-actions-mobile { flex-direction: column; gap: 12px; }
+            .bottom-actions-mobile .btn { width: 100%; height: 40px; justify-content: center; }
+			
+			.desktop-view-btn { display: none !important; }
+            .mobile-view-btn { display: flex !important; width: 100%; justify-content: center; height: 40px; }
         }
     </style>
 </head>
@@ -332,6 +348,7 @@
     <symbol id="icon-up" viewBox="0 0 16 16"><path d="M3.47 7.78a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0l4.25 4.25a.751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018L8.75 4.56v9.69a.75.75 0 0 1-1.5 0V4.56L4.03 7.78a.75.75 0 0 1-1.06 0Z"></path></symbol>
     <symbol id="icon-check" viewBox="0 0 16 16"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></symbol>
 	<symbol id="icon-stop" viewBox="0 0 16 16"><path d="M5 3.5h6A1.5 1.5 0 0 1 12.5 5v6a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 11V5A1.5 1.5 0 0 1 5 3.5z"/></symbol>
+    <symbol id="icon-list" viewBox="0 0 16 16"><path d="M2 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3.75-1.5a.75.75 0 0 0 0 1.5h8.5a.75.75 0 0 0 0-1.5h-8.5zm0 5a.75.75 0 0 0 0 1.5h8.5a.75.75 0 0 0 0-1.5h-8.5zm0 5a.75.75 0 0 0 0 1.5h8.5a.75.75 0 0 0 0-1.5h-8.5zM3 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-1 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"></path></symbol>
 </svg>
 
 <div class="container fade-screen" id="main-container">
@@ -343,7 +360,7 @@
         </button>
     </div>
 
-    <div id="setup-screen">
+    <div id="setup-screen" style="display: none;">
         <div class="Box mb-24">
             <h3 class="Box-header">Вибір предмета</h3>
             <div class="Box-row flex-col cursor-default">
@@ -365,10 +382,12 @@
                 <div>
                     <strong class="block fw-600 mb-4">Тренування</strong>
                     <span class="fs-12 text-muted block">Довільна кількість питань.</span>
-                    <div class="flex items-center gap-8 mt-12" onclick="event.preventDefault()">
-                        <span class="fs-12 fw-500 text-default">Кількість:</span>
-                        <input type="number" id="question-count" min="1" max="1000" class="w-80" onclick="event.stopPropagation()" onchange="this.value = Math.max(1, Math.min(this.value, this.max)); saveSettings()">
-                    </div>
+					<div class="flex items-center gap-8 mt-12 range-mobile-wrap" onclick="event.preventDefault()">
+						<span class="fs-12 fw-500 text-default">Питання з:</span>
+						<input type="number" id="range-from" min="1" class="w-80" onclick="event.stopPropagation()" onchange="validateRange('from'); saveSettings()">
+						<span class="fs-12 fw-500 text-default">по:</span>
+						<input type="number" id="range-to" min="1" class="w-80" onclick="event.stopPropagation()" onchange="validateRange('to'); saveSettings()">
+					</div>
                 </div>
             </label>
             <label class="Box-row flex items-start">
@@ -391,9 +410,12 @@
             </label>
         </div>
         
-        <div class="mt-8 flex items-center">
+		<div class="mt-16 flex items-center gap-16 main-btns-mobile">
             <button class="btn btn-primary" onclick="startTest()">
                 <svg class="icon mr-6"><use href="#icon-play"></use></svg> Почати тестування
+            </button>
+            <button class="btn" onclick="startViewMode()">
+                <svg class="icon mr-6"><use href="#icon-list"></use></svg> Перегляд бази
             </button>
             <span id="start-error" class="fs-12 fw-500 text-danger ml-8" style="display: none;"></span>
         </div>
@@ -460,6 +482,36 @@
             </button>
         </div>
     </div>
+
+		<div id="view-screen">
+				<!-- Рядок із заголовком і кнопкою (Кнопка працює тільки на ПК) -->
+				<div class="flex justify-between items-center mb-8">
+					<h2 class="fs-24 mb-0">Перегляд бази: <span id="view-subject-title" class="text-muted"></span></h2>
+					
+					<button class="btn flex items-center desktop-view-btn" onclick="closeViewMode()">
+						<svg class="icon mr-6"><use href="#icon-prev"></use></svg> Повернутися
+					</button>
+				</div>
+				
+				<!-- Текст підказки -->
+				<p class="text-muted fs-14 mt-0 mb-16" id="view-db-hint">Доступно питань у базі: 0</p>
+				
+				<!-- Широка кнопка під текстом (Працює тільки на телефоні) -->
+				<button class="btn flex items-center mobile-view-btn mb-16" onclick="closeViewMode()">
+					<svg class="icon mr-6"><use href="#icon-prev"></use></svg> Повернутися
+				</button>
+								
+				<hr>
+					
+			<div id="view-container"></div>
+			
+			<div class="mt-32 flex justify-between bottom-actions-mobile">
+				<button onclick="window.scrollTo({top: 0, behavior: 'smooth'});" class="btn btn-back-top flex items-center gap-8">
+					<svg class="icon"><use href="#icon-up"></use></svg> Повернутися нагору
+				</button>
+				<button class="btn flex items-center" onclick="closeViewMode()"><svg class="icon mr-6"><use href="#icon-prev"></use></svg> Повернутися</button>
+			</div>
+		</div>
 
 </div>
 
@@ -9469,10 +9521,10 @@ E Черевна порожнина
 Текст задания Пiд час судовомедичної експертизи жiнки, яка загинула у автокатастрофi,
 знайдено ембрiон на стадiї ранньої гаструли. Назвiть мiсце його локалiзацiї за умови
 нормального розвитку:<!--КРОК1 2014, 2015-->
+Правильный ответ Стiнка матки
 A Черевна порожнина
 B Маткова частина яйцепроводу
 C Ампульна частина яйцепроводу
-Правильный ответ Стiнка матки
 E Яєчник
 № 445
 Тема Хрящова тканина
@@ -14115,77 +14167,111 @@ E Трофобластичну`
     let targetEndTime = 0;
     let startTime = 0;
     let displayedSeconds = 0;
+	
+	let renderViewTimeout = null;
+	let renderResultTimeout = null;
 
-    function toggleTheme() {
-        const html = document.documentElement;
-        html.classList.add('theme-switching');
-        
-        const next = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-        html.setAttribute('data-theme', next);
-        
-        document.getElementById('theme-icon-use').setAttribute('href', next === 'light' ? '#icon-sun' : '#icon-moon');
-        document.getElementById('theme-color-meta').setAttribute('content', next === 'light' ? '#f6f8fa' : '#0d1117');
-        
-        localStorage.setItem('theme', next);
-        setTimeout(() => html.classList.remove('theme-switching'), 300);
-    }
+	function toggleTheme() {
+			const switchTheme = () => {
+				const html = document.documentElement;
+				const next = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+				html.setAttribute('data-theme', next);
+				
+				document.getElementById('theme-icon-use').setAttribute('href', next === 'light' ? '#icon-sun' : '#icon-moon');
+				document.getElementById('theme-color-meta').setAttribute('content', next === 'light' ? '#f6f8fa' : '#0d1117');
+				
+				localStorage.setItem('theme', next);
+			};
+
+			if (!document.startViewTransition) {
+				switchTheme();
+			} else {
+				document.startViewTransition(switchTheme);
+			}
+		}
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadSettings();
+        updateHint(false);
+        loadGameState();
+    });
 
 	function loadSettings() {
-			const savedSubj = localStorage.getItem('subject');
-			if (savedSubj) document.getElementById('subject-select').value = savedSubj;
+		const savedSubj = localStorage.getItem('subject');
+		if (savedSubj) document.getElementById('subject-select').value = savedSubj;
 
-			const savedMode = localStorage.getItem('testMode');
-			if (savedMode) {
-				const radio = document.querySelector(`input[name="testMode"][value="${savedMode}"]`);
-				if (radio) radio.checked = true;
-			}
-
-			const savedImmediate = localStorage.getItem('immediateMode');
-			if (savedImmediate !== null) document.getElementById('immediate-mode').checked = savedImmediate === 'true';
-			
-			const savedCount = localStorage.getItem('customCount');
-			if (savedCount) document.getElementById('question-count').value = savedCount;
-
-			const currentTheme = document.documentElement.getAttribute('data-theme');
-			document.getElementById('theme-icon-use').setAttribute('href', currentTheme === 'light' ? '#icon-sun' : '#icon-moon');
+		const savedMode = localStorage.getItem('testMode');
+		if (savedMode) {
+			const radio = document.querySelector(`input[name="testMode"][value="${savedMode}"]`);
+			if (radio) radio.checked = true;
 		}
 
-    function saveSettings() {
-        localStorage.setItem('subject', document.getElementById('subject-select').value);
-        localStorage.setItem('testMode', document.querySelector('input[name="testMode"]:checked').value);
-        localStorage.setItem('immediateMode', document.getElementById('immediate-mode').checked);
-        localStorage.setItem('customCount', document.getElementById('question-count').value);
-    }
+		const savedImmediate = localStorage.getItem('immediateMode');
+		if (savedImmediate !== null) document.getElementById('immediate-mode').checked = savedImmediate === 'true';
 
-	document.addEventListener('DOMContentLoaded', () => {
-		loadSettings();
-		updateHint(false);
-		loadGameState();
-	});	
+		const currentTheme = document.documentElement.getAttribute('data-theme');
+		document.getElementById('theme-icon-use').setAttribute('href', currentTheme === 'light' ? '#icon-sun' : '#icon-moon');
+	}
+	
+	function validateRange(changedField) {
+		const fromInput = document.getElementById('range-from');
+		const toInput = document.getElementById('range-to');
+		const max = parseInt(toInput.max) || 1;
+
+		let fromVal = parseInt(fromInput.value) || 1;
+		let toVal = parseInt(toInput.value) || max;
+
+		fromVal = Math.max(1, Math.min(fromVal, max));
+		toVal = Math.max(1, Math.min(toVal, max));
+
+		if (fromVal > toVal) {
+			if (changedField === 'from') toVal = fromVal;
+			else fromVal = toVal;
+		}
+
+		fromInput.value = fromVal;
+		toInput.value = toVal;
+	}
+
+	function saveSettings() {
+		localStorage.setItem('subject', document.getElementById('subject-select').value);
+		localStorage.setItem('testMode', document.querySelector('input[name="testMode"]:checked').value);
+		localStorage.setItem('immediateMode', document.getElementById('immediate-mode').checked);
+		localStorage.setItem('rangeFrom', document.getElementById('range-from').value);
+		localStorage.setItem('rangeTo', document.getElementById('range-to').value);
+	}
 
 	function updateHint(isManualChange = false) {
-			const subj = document.getElementById('subject-select').value;
-			const allQuestions = parseText(databases[subj]);
-			const count = allQuestions.length;
-			
-			document.getElementById('db-hint').innerText = `Доступно питань у базі: ${count}`;
-			
-			const countInput = document.getElementById('question-count');
-			countInput.max = count;
-			
-			if (isManualChange) {
-				countInput.value = count;
+		const subj = document.getElementById('subject-select').value;
+		const allQuestions = parseText(databases[subj]);
+		const count = allQuestions.length;
+		
+		document.getElementById('db-hint').innerText = `Доступно питань у базі: ${count}`;
+		
+		const fromInput = document.getElementById('range-from');
+		const toInput = document.getElementById('range-to');
+		
+		fromInput.max = count;
+		toInput.max = count;
+		
+		if (isManualChange) {
+			fromInput.value = 1;
+			toInput.value = count;
+		} else {
+			const savedFrom = localStorage.getItem('rangeFrom');
+			const savedTo = localStorage.getItem('rangeTo');
+			if (savedFrom && savedTo) {
+				fromInput.value = Math.min(parseInt(savedFrom), count);
+				toInput.value = Math.min(parseInt(savedTo), count);
 			} else {
-				const savedCount = localStorage.getItem('customCount');
-				if (savedCount) {
-					countInput.value = Math.min(parseInt(savedCount), count);
-				} else {
-					countInput.value = count;
-				}
+				fromInput.value = 1;
+				toInput.value = count;
 			}
-			
-			saveSettings();
 		}
+		
+		validateRange();
+		saveSettings();
+	}
 
     function getLetter(index) { return String.fromCharCode(65 + index); }
 	function formatQuestionHTML(text) { return escapeHTML((text || '').trim()); }
@@ -14284,16 +14370,19 @@ E Трофобластичну`
         isImmediateMode = document.getElementById('immediate-mode').checked;
         isControlMode = document.querySelector('input[name="testMode"]:checked').value === 'control';
 
-        if (isControlMode) {
-            allQuestions = shuffle(allQuestions);
-            questions = allQuestions.slice(0, 50);
-            document.getElementById('timer-label').innerText = 'Залишилось часу:';
-        } else {
-            let count = parseInt(document.getElementById('question-count').value) || 20;
-            let subset = allQuestions.slice(0, count);
-            questions = shuffle(subset);
-            document.getElementById('timer-label').innerText = 'Пройшло часу:';
-        }
+		if (isControlMode) {
+			allQuestions = shuffle(allQuestions);
+			questions = allQuestions.slice(0, 50);
+			document.getElementById('timer-label').innerText = 'Залишилось часу:';
+		} else {
+			let fromVal = parseInt(document.getElementById('range-from').value) || 1;
+			let toVal = parseInt(document.getElementById('range-to').value) || allQuestions.length;
+			
+			let subset = allQuestions.slice(fromVal - 1, toVal);
+			
+			questions = shuffle(subset);
+			document.getElementById('timer-label').innerText = 'Пройшло часу:';
+		}
 
         questions.forEach(q => q.options = shuffle(q.options));
         currentQuestionIndex = 0;
@@ -14307,6 +14396,89 @@ E Трофобластичну`
         renderQuestionHTML(true); 
         startTimer();
 		saveGameState('test');
+    }
+
+	function startViewMode(isReload = false) {
+        const errorSpan = document.getElementById('start-error');
+        errorSpan.style.display = 'none';
+
+        saveSettings(); 
+        const subjSelect = document.getElementById('subject-select');
+        const subj = subjSelect.value;
+        const subjName = subjSelect.options[subjSelect.selectedIndex].text;
+        const text = databases[subj];
+        
+        let allQuestions = parseText(text);
+        if (allQuestions.length === 0) { 
+            errorSpan.innerText = 'Помилка: база порожня або невірний формат.';
+            errorSpan.style.display = 'inline-block';
+            return; 
+        }
+
+        document.getElementById('view-subject-title').innerText = subjName;
+		document.getElementById('view-db-hint').innerText = `Доступно питань у базі: ${allQuestions.length}`;
+        const viewContainer = document.getElementById('view-container');
+        viewContainer.innerHTML = ''; // Очищаємо перед рендером
+        
+        document.getElementById('setup-screen').style.display = 'none';
+        const viewScreen = document.getElementById('view-screen');
+        viewScreen.style.display = 'block';
+        
+        if (!isReload) {
+            viewScreen.classList.remove('fade-screen');
+            void viewScreen.offsetWidth; // Перезапуск анімації
+            viewScreen.classList.add('fade-screen');
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        // АСИНХРОННИЙ РЕНДЕРИНГ (Вирішує проблему з лагами)
+        clearTimeout(renderViewTimeout);
+        let currentIndex = 0;
+        const CHUNK_SIZE = 20; // Кількість питань за один кадр
+
+        function renderChunk() {
+            let html = '';
+            let max = Math.min(currentIndex + CHUNK_SIZE, allQuestions.length);
+            
+            for (let i = currentIndex; i < max; i++) {
+                let q = allQuestions[i];
+                html += `<div class="review-item"><div class="question-text">${i + 1}. ${formatQuestionHTML(q.question)}</div><div class="Box mb-0">`;
+                
+                q.options.forEach((opt, oIndex) => {
+                    let isCorrect = (oIndex === 0);
+                    let optClass = isCorrect ? 'diff-add' : '';
+                    let label = isCorrect ? ' <span class="label ml-8">Правильно</span>' : '';
+                    
+                    html += `<div class="Box-row flex items-start cursor-default ${optClass}" style="pointer-events: none;">
+                        <span><strong class="mr-6">${getLetter(oIndex)})</strong>${escapeHTML(opt.text)}${label}</span>
+                    </div>`;
+                });
+                html += `</div></div>`;
+            }
+
+            viewContainer.insertAdjacentHTML('beforeend', html);
+            currentIndex = max;
+
+            if (currentIndex < allQuestions.length) {
+                renderViewTimeout = setTimeout(renderChunk, 10);
+            }
+        }
+
+        renderChunk();
+        saveGameState('view'); // Зберігаємо стан
+    }
+
+    function closeViewMode() {
+        clearTimeout(renderViewTimeout); // Зупиняємо рендер, якщо користувач вийшов рано
+        document.getElementById('view-screen').style.display = 'none';
+        document.getElementById('view-container').innerHTML = '';
+        
+        const setupScreen = document.getElementById('setup-screen');
+        setupScreen.style.display = 'block';
+        setupScreen.classList.add('fade-screen');
+        window.scrollTo({top: 0, behavior: 'smooth'});
+        
+        saveGameState('setup'); // Повертаємо початковий стан
     }
 
     function startTimer() {
@@ -14374,28 +14546,48 @@ E Трофобластичну`
     }
 
 	function updateGrid(isInitial = false) {
-			questions.forEach((q, idx) => {
-				const dot = document.getElementById(`dot-${idx}`);
-				dot.className = 'q-dot';
-				if (idx === currentQuestionIndex) dot.classList.add('active');
-				else if (q.userAnswerIndex !== null) {
-					if (isImmediateMode) {
-						dot.classList.add(q.options[q.userAnswerIndex].isCorrect ? 'correct' : 'wrong');
-					} else {
-						dot.classList.add('answered');
-					}
-				}
-			});
-			
-			const activeDot = document.getElementById(`dot-${currentQuestionIndex}`);
-			
-			if(activeDot && window.innerWidth > 768) { 
-				activeDot.scrollIntoView({ 
-					behavior: isInitial ? 'auto' : 'smooth', 
-					block: 'nearest' 
-				});
-			}
-		}
+        questions.forEach((q, idx) => {
+            const dot = document.getElementById(`dot-${idx}`);
+            dot.className = 'q-dot';
+            if (idx === currentQuestionIndex) dot.classList.add('active');
+            else if (q.userAnswerIndex !== null) {
+                if (isImmediateMode) {
+                    dot.classList.add(q.options[q.userAnswerIndex].isCorrect ? 'correct' : 'wrong');
+                } else {
+                    dot.classList.add('answered');
+                }
+            }
+        });
+        
+        const activeDot = document.getElementById(`dot-${currentQuestionIndex}`);
+        const container = document.getElementById('grid-scroll-container');
+        
+        if(activeDot && container) { 
+            if (window.innerWidth > 768) { 
+                // На ПК залишаємо стандартну поведінку
+                activeDot.scrollIntoView({ 
+                    behavior: isInitial ? 'auto' : 'smooth', 
+                    block: 'nearest' 
+                });
+            } else {
+                // На телефоні рахуємо точні пікселі на екрані
+                const dotRect = activeDot.getBoundingClientRect();
+                const containerRect = container.getBoundingClientRect();
+                
+                // Рахуємо позицію кнопки відносно видимого віконця контейнера
+                const relativeTop = dotRect.top - containerRect.top;
+                const relativeBottom = dotRect.bottom - containerRect.top;
+
+                if (relativeTop < 0) {
+                    // Якщо кнопка сховалася ЗВЕРХУ (додаємо -8px щоб був відступ)
+                    container.scrollBy({ top: relativeTop - 8, behavior: isInitial ? 'auto' : 'smooth' });
+                } else if (relativeBottom > containerRect.height) {
+                    // Якщо кнопка сховалася ЗНИЗУ (додаємо +8px щоб був відступ)
+                    container.scrollBy({ top: relativeBottom - containerRect.height + 8, behavior: isInitial ? 'auto' : 'smooth' });
+                }
+            }
+        }
+    }
 
     function renderQuestionHTML(isInitial = false) {
         const wrapper = document.getElementById('question-wrapper');
@@ -14480,41 +14672,75 @@ E Трофобластичну`
     function confirmFinish() { closeModal(); finishTest(); }
 
 	function finishTest(isReload = false) {
-			clearInterval(timerInterval);
-			document.getElementById('test-screen').style.display = 'none';
+        clearInterval(timerInterval);
+        clearTimeout(renderResultTimeout); // Зупиняємо попередній рендер, якщо був
 
-			const resultScreen = document.getElementById('result-screen');
-			resultScreen.style.display = 'block';
-			
-			if (!isReload) resultScreen.classList.add('fade-screen');
-			
-			window.scrollTo({top: 0, behavior: 'smooth'});
+        document.getElementById('test-screen').style.display = 'none';
 
-			let score = 0, reviewHtml = '';
-			questions.forEach((q, qIndex) => {
-				if (q.userAnswerIndex !== null && q.options[q.userAnswerIndex].isCorrect) score++;
-				
-				reviewHtml += `<div class="review-item"><div class="question-text">${qIndex + 1}. ${formatQuestionHTML(q.question)}</div><div class="Box mb-0">`;
-				q.options.forEach((opt, oIndex) => {
-					let optClass = opt.isCorrect ? 'diff-add' : (q.userAnswerIndex === oIndex ? 'diff-del' : '');
-					let userMark = q.userAnswerIndex === oIndex ? ' <span class="label ml-8">Обрано</span>' : (q.userAnswerIndex === null && opt.isCorrect ? ' <span class="label ml-8">Пропущено</span>' : '');
-					reviewHtml += `<div class="Box-row flex items-start cursor-default ${optClass}" style="pointer-events: none;"><span><strong class="mr-6">${getLetter(oIndex)})</strong>${escapeHTML(opt.text)}${userMark}</span></div>`;
-				});
-				reviewHtml += `</div></div>`;
-			});
+        const resultScreen = document.getElementById('result-screen');
+        resultScreen.style.display = 'block';
+        
+        if (!isReload) resultScreen.classList.add('fade-screen');
+        
+        window.scrollTo({top: 0, behavior: 'smooth'});
 
-			const percentage = Math.round((score / questions.length) * 100);
-			const threshold = isControlMode ? 94 : 80;
-			const colorClass = percentage >= threshold ? 'text-success' : 'text-danger';
-			
-			document.getElementById('final-score-percent').innerHTML = `<span class="${colorClass}">${percentage}%</span>`;
-			document.getElementById('final-score-text').innerHTML = `Правильних відповідей: <strong>${score} з ${questions.length}</strong>`;
-			document.getElementById('review-container').innerHTML = reviewHtml;
+        // 1. Швидко рахуємо бал (це не гальмує браузер)
+        let score = 0;
+        questions.forEach((q) => {
+            if (q.userAnswerIndex !== null && q.options[q.userAnswerIndex].isCorrect) score++;
+        });
 
-			if (!isReload) saveGameState('result');
-		}
+        // 2. Миттєво показуємо результат і оцінку зверху
+        const percentage = Math.round((score / questions.length) * 100);
+        const threshold = isControlMode ? 94 : 80;
+        const colorClass = percentage >= threshold ? 'text-success' : 'text-danger';
+        
+        document.getElementById('final-score-percent').innerHTML = `<span class="${colorClass}">${percentage}%</span>`;
+        document.getElementById('final-score-text').innerHTML = `Правильних відповідей: <strong>${score} з ${questions.length}</strong>`;
+        
+        const reviewContainer = document.getElementById('review-container');
+        reviewContainer.innerHTML = ''; // Очищаємо контейнер
+
+        if (!isReload) saveGameState('result');
+
+        // 3. АСИНХРОННИЙ РЕНДЕР АНАЛІЗУ ПОМИЛОК (щоб не лагало)
+        let currentIndex = 0;
+        const CHUNK_SIZE = 20;
+
+        function renderResultChunk() {
+            let html = '';
+            let max = Math.min(currentIndex + CHUNK_SIZE, questions.length);
+            
+            for (let i = currentIndex; i < max; i++) {
+                let q = questions[i];
+                html += `<div class="review-item"><div class="question-text">${i + 1}. ${formatQuestionHTML(q.question)}</div><div class="Box mb-0">`;
+                
+                q.options.forEach((opt, oIndex) => {
+                    let optClass = opt.isCorrect ? 'diff-add' : (q.userAnswerIndex === oIndex ? 'diff-del' : '');
+                    let userMark = q.userAnswerIndex === oIndex ? ' <span class="label ml-8">Обрано</span>' : (q.userAnswerIndex === null && opt.isCorrect ? ' <span class="label ml-8">Пропущено</span>' : '');
+                    html += `<div class="Box-row flex items-start cursor-default ${optClass}" style="pointer-events: none;"><span><strong class="mr-6">${getLetter(oIndex)})</strong>${escapeHTML(opt.text)}${userMark}</span></div>`;
+                });
+                
+                html += `</div></div>`;
+            }
+
+            reviewContainer.insertAdjacentHTML('beforeend', html);
+            currentIndex = max;
+
+            if (currentIndex < questions.length) {
+                renderResultTimeout = setTimeout(renderResultChunk, 10);
+            }
+        }
+
+        renderResultChunk(); // Запускаємо малювання
+    }
 	
 	function saveGameState(screenName) {
+        let activeScreen = 'setup';
+        if (document.getElementById('test-screen').style.display === 'block') activeScreen = 'test';
+        else if (document.getElementById('result-screen').style.display === 'block') activeScreen = 'result';
+        else if (document.getElementById('view-screen').style.display === 'block') activeScreen = 'view';
+
 		const state = {
 			questions,
 			currentQuestionIndex,
@@ -14522,25 +14748,30 @@ E Трофобластичну`
 			isControlMode,
 			startTime,
 			targetEndTime,
-			screen: screenName || (document.getElementById('test-screen').style.display === 'block' ? 'test' : 
-					 document.getElementById('result-screen').style.display === 'block' ? 'result' : 'setup')
+			screen: screenName || activeScreen
 		};
 		localStorage.setItem('testgen_progress', JSON.stringify(state));
 	}
 
 	function loadGameState() {
 		const saved = localStorage.getItem('testgen_progress');
-		if (!saved) return;
+		if (!saved) {
+			document.getElementById('setup-screen').style.display = 'block'; // Показуємо, якщо немає збереження
+			return;
+		}
+		
 		const state = JSON.parse(saved);
 
-		questions = state.questions;
-		currentQuestionIndex = state.currentQuestionIndex;
-		isImmediateMode = state.isImmediateMode;
-		isControlMode = state.isControlMode;
-		startTime = state.startTime;
-		targetEndTime = state.targetEndTime;
+		questions = state.questions || [];
+		currentQuestionIndex = state.currentQuestionIndex || 0;
+		isImmediateMode = state.isImmediateMode || false;
+		isControlMode = state.isControlMode || false;
+		startTime = state.startTime || 0;
+		targetEndTime = state.targetEndTime || 0;
 
-		if (state.screen === 'test') {
+		if (state.screen === 'setup' || !state.screen) {
+			document.getElementById('setup-screen').style.display = 'block';
+		} else if (state.screen === 'test') {
 			document.getElementById('setup-screen').style.display = 'none';
 			document.getElementById('test-screen').style.display = 'block';
 			initGrid();
@@ -14549,6 +14780,9 @@ E Трофобластичну`
 		} else if (state.screen === 'result') {
 			document.getElementById('setup-screen').style.display = 'none';
 			finishTest(true);
+		} else if (state.screen === 'view') {
+			document.getElementById('setup-screen').style.display = 'none';
+			startViewMode(true); 
 		}
 	}
 
