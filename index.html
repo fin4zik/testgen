@@ -197,7 +197,6 @@
 			transition: background-color 0.2s ease, box-shadow 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
 		}
         .Box-row:first-of-type { border-top: none; }
-        #question-wrapper .Box-row:hover { background-color: var(--color-canvas-body); }
         #question-wrapper .Box-row.locked { cursor: default; pointer-events: none; }
 
         /* BUTTONS */
@@ -206,20 +205,24 @@
             border: 1px solid var(--color-btn-border); border-radius: 6px; cursor: pointer; font-size: 14px; 
             font-weight: 500; line-height: 20px; height: 32px; display: inline-flex; align-items: center; justify-content: center;
         }
-        .btn:hover { background-color: var(--color-btn-hover-bg); }
         .btn-primary { background-color: var(--color-success-emphasis); color: #ffffff; border-color: rgba(27, 31, 36, 0.15); }
-        .btn-primary:hover { background-color: var(--color-success-hover); color: #ffffff;}
         .btn-danger { color: var(--color-danger-fg); border-color: var(--color-btn-border); }
-        .btn-danger:hover { background-color: var(--color-danger-hover); color: #ffffff; border-color: var(--color-danger-hover); }
 
         .btn-theme { 
             width: 32px; height: 32px; padding: 0; border: none; background: transparent; 
             box-shadow: none; color: var(--color-fg-muted); 
         }
-        .btn-theme:hover { color: var(--color-fg-default); background: var(--color-btn-hover-bg); }
+		
+		@media (hover: hover) {
+			#question-wrapper .Box-row:hover { background-color: var(--color-canvas-body); }
+			.btn:hover { background-color: var(--color-btn-hover-bg); }
+			.btn-primary:hover { background-color: var(--color-success-hover); color: #ffffff;}
+			.btn-danger:hover { background-color: var(--color-danger-hover); color: #ffffff; border-color: var(--color-danger-hover); }
+			.btn-theme:hover { color: var(--color-fg-default); background: var(--color-btn-hover-bg); }
+			.btn-back-top:hover { border-color: var(--color-accent-fg); }
+		}
 
         .btn-back-top { color: var(--color-accent-fg); background-color: var(--color-canvas-overlay); }
-        .btn-back-top:hover { border-color: var(--color-accent-fg); }
 
         /* CHECKBOXES & RADIOS */
         .form-checkbox { 
@@ -334,6 +337,10 @@
 			.desktop-view-btn { display: none !important; }
             .mobile-view-btn { display: flex !important; width: 100%; justify-content: center; height: 40px; }
         }
+		
+		#theme-btn svg {
+			view-transition-name: none;
+		}
     </style>
 </head>
 <body>
@@ -394,7 +401,7 @@
                 <input type="radio" name="testMode" value="control" onchange="saveSettings()"> 
                 <div>
                     <strong class="block fw-600 mb-4">Контроль</strong>
-                    <span class="fs-12 text-muted block">50 питань, таймер 35 хвилин.</span>
+                    <span class="fs-12 text-muted block">50 питань, таймер 30 хвилин.</span>
                 </div>
             </label>
         </div>
@@ -14172,6 +14179,7 @@ E Трофобластичну`
 	let renderResultTimeout = null;
 
 	function toggleTheme() {
+			document.getElementById('theme-btn').blur();
 			const switchTheme = () => {
 				const html = document.documentElement;
 				const next = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
@@ -14486,8 +14494,8 @@ E Трофобластичну`
         const now = Date.now();
         
         if (isControlMode) {
-            targetEndTime = now + (35 * 60 * 1000);
-            displayedSeconds = 35 * 60;
+            targetEndTime = now + (30 * 60 * 1000);
+            displayedSeconds = 30 * 60;
         } else {
             startTime = now;
             displayedSeconds = 0;
@@ -14692,7 +14700,7 @@ E Трофобластичну`
 
         // 2. Миттєво показуємо результат і оцінку зверху
         const percentage = Math.round((score / questions.length) * 100);
-        const threshold = isControlMode ? 94 : 80;
+        const threshold = isControlMode ? 90 : 80;
         const colorClass = percentage >= threshold ? 'text-success' : 'text-danger';
         
         document.getElementById('final-score-percent').innerHTML = `<span class="${colorClass}">${percentage}%</span>`;
