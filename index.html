@@ -221,6 +221,16 @@
 			.btn-theme:hover { color: var(--color-fg-default); background: var(--color-btn-hover-bg); }
 			.btn-back-top:hover { border-color: var(--color-accent-fg); }
 		}
+		
+		@media (hover: none) {
+			#question-wrapper .Box-row:not(.locked):active { background-color: var(--color-canvas-body); }
+			
+			.btn:active { background-color: var(--color-btn-hover-bg); }
+			.btn-primary:active { background-color: var(--color-success-hover); color: #ffffff;}
+			.btn-danger:active { background-color: var(--color-danger-hover); color: #ffffff; border-color: var(--color-danger-hover); }
+			.btn-theme:active { color: var(--color-fg-default); background: var(--color-btn-hover-bg); }
+			.btn-back-top:active { border-color: var(--color-accent-fg); }
+		}
 
         .btn-back-top { color: var(--color-accent-fg); background-color: var(--color-canvas-overlay); }
 
@@ -14426,7 +14436,7 @@ E Трофобластичну`
         document.getElementById('view-subject-title').innerText = subjName;
 		document.getElementById('view-db-hint').innerText = `Доступно питань у базі: ${allQuestions.length}`;
         const viewContainer = document.getElementById('view-container');
-        viewContainer.innerHTML = ''; // Очищаємо перед рендером
+        viewContainer.innerHTML = '';
         
         document.getElementById('setup-screen').style.display = 'none';
         const viewScreen = document.getElementById('view-screen');
@@ -14434,15 +14444,14 @@ E Трофобластичну`
         
         if (!isReload) {
             viewScreen.classList.remove('fade-screen');
-            void viewScreen.offsetWidth; // Перезапуск анімації
+            void viewScreen.offsetWidth;
             viewScreen.classList.add('fade-screen');
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
-        // АСИНХРОННИЙ РЕНДЕРИНГ (Вирішує проблему з лагами)
         clearTimeout(renderViewTimeout);
         let currentIndex = 0;
-        const CHUNK_SIZE = 20; // Кількість питань за один кадр
+        const CHUNK_SIZE = 20;
 
         function renderChunk() {
             let html = '';
@@ -14473,11 +14482,11 @@ E Трофобластичну`
         }
 
         renderChunk();
-        saveGameState('view'); // Зберігаємо стан
+        saveGameState('view');
     }
 
     function closeViewMode() {
-        clearTimeout(renderViewTimeout); // Зупиняємо рендер, якщо користувач вийшов рано
+        clearTimeout(renderViewTimeout);
         document.getElementById('view-screen').style.display = 'none';
         document.getElementById('view-container').innerHTML = '';
         
@@ -14486,7 +14495,7 @@ E Трофобластичну`
         setupScreen.classList.add('fade-screen');
         window.scrollTo({top: 0, behavior: 'smooth'});
         
-        saveGameState('setup'); // Повертаємо початковий стан
+        saveGameState('setup');
     }
 
     function startTimer() {
@@ -14572,25 +14581,20 @@ E Трофобластичну`
         
         if(activeDot && container) { 
             if (window.innerWidth > 768) { 
-                // На ПК залишаємо стандартну поведінку
                 activeDot.scrollIntoView({ 
                     behavior: isInitial ? 'auto' : 'smooth', 
                     block: 'nearest' 
                 });
             } else {
-                // На телефоні рахуємо точні пікселі на екрані
                 const dotRect = activeDot.getBoundingClientRect();
                 const containerRect = container.getBoundingClientRect();
                 
-                // Рахуємо позицію кнопки відносно видимого віконця контейнера
                 const relativeTop = dotRect.top - containerRect.top;
                 const relativeBottom = dotRect.bottom - containerRect.top;
 
                 if (relativeTop < 0) {
-                    // Якщо кнопка сховалася ЗВЕРХУ (додаємо -8px щоб був відступ)
                     container.scrollBy({ top: relativeTop - 8, behavior: isInitial ? 'auto' : 'smooth' });
                 } else if (relativeBottom > containerRect.height) {
-                    // Якщо кнопка сховалася ЗНИЗУ (додаємо +8px щоб був відступ)
                     container.scrollBy({ top: relativeBottom - containerRect.height + 8, behavior: isInitial ? 'auto' : 'smooth' });
                 }
             }
@@ -14681,7 +14685,7 @@ E Трофобластичну`
 
 	function finishTest(isReload = false) {
         clearInterval(timerInterval);
-        clearTimeout(renderResultTimeout); // Зупиняємо попередній рендер, якщо був
+        clearTimeout(renderResultTimeout);
 
         document.getElementById('test-screen').style.display = 'none';
 
@@ -14692,13 +14696,11 @@ E Трофобластичну`
         
         window.scrollTo({top: 0, behavior: 'smooth'});
 
-        // 1. Швидко рахуємо бал (це не гальмує браузер)
         let score = 0;
         questions.forEach((q) => {
             if (q.userAnswerIndex !== null && q.options[q.userAnswerIndex].isCorrect) score++;
         });
 
-        // 2. Миттєво показуємо результат і оцінку зверху
         const percentage = Math.round((score / questions.length) * 100);
         const threshold = isControlMode ? 90 : 80;
         const colorClass = percentage >= threshold ? 'text-success' : 'text-danger';
@@ -14707,11 +14709,10 @@ E Трофобластичну`
         document.getElementById('final-score-text').innerHTML = `Правильних відповідей: <strong>${score} з ${questions.length}</strong>`;
         
         const reviewContainer = document.getElementById('review-container');
-        reviewContainer.innerHTML = ''; // Очищаємо контейнер
+        reviewContainer.innerHTML = '';
 
         if (!isReload) saveGameState('result');
 
-        // 3. АСИНХРОННИЙ РЕНДЕР АНАЛІЗУ ПОМИЛОК (щоб не лагало)
         let currentIndex = 0;
         const CHUNK_SIZE = 20;
 
@@ -14740,7 +14741,7 @@ E Трофобластичну`
             }
         }
 
-        renderResultChunk(); // Запускаємо малювання
+        renderResultChunk();
     }
 	
 	function saveGameState(screenName) {
@@ -14764,7 +14765,7 @@ E Трофобластичну`
 	function loadGameState() {
 		const saved = localStorage.getItem('testgen_progress');
 		if (!saved) {
-			document.getElementById('setup-screen').style.display = 'block'; // Показуємо, якщо немає збереження
+			document.getElementById('setup-screen').style.display = 'block';
 			return;
 		}
 		
